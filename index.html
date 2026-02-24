@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGNIS - MCI Profesional</title>
+    <style>
+        :root { --f: #fee275; --o: #5d4037; }
+        body { margin: 0; padding: 30px; background: var(--f); font-family: 'Georgia', serif; display: flex; flex-direction: column; align-items: center; }
+        h1 { color: var(--o); letter-spacing: 8px; margin-bottom: 40px; font-size: 2.5rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.1); }
+        .tablero { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; max-width: 1400px; }
+        @media (min-width: 900px) { .tablero { grid-template-columns: repeat(5, 1fr); } }
+        @media (min-width: 1300px) { .tablero { grid-template-columns: repeat(6, 1fr); } }
+        .min { aspect-ratio: 2/3; cursor: pointer; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.2); border: 3px solid white; transition: all 0.3s ease; }
+        .min:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .min img { width: 100%; height: 100%; object-fit: cover; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
+        .escena { width: 85vw; max-width: 450px; height: 70vh; max-height: 675px; perspective: 1500px; }
+        .carta-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .rotar { transform: rotateY(180deg); }
+        .cara { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px; border: 10px solid white; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.6); }
+        .cara-atras { transform: rotateY(180deg); }
+        img { width: 100%; height: 100%; object-fit: cover; }
+        .btn { margin-top: 40px; padding: 15px 50px; background: #e74c3c; color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+    </style>
+</head>
+<body>
+    <h1>IGNIS</h1>
+    <div class="tablero" id="mazo"></div>
+    <div id="overlay">
+        <div class="escena">
+            <div class="carta-inner" id="visual" onclick="girar()">
+                <div class="cara"><img id="img1" src=""></div>
+                <div class="cara cara-atras"><img id="img2" src=""></div>
+            </div>
+        </div>
+        <button class="btn" onclick="cerrar()">FINALIZAR LECTURA</button>
+    </div>
+    <script>
+        const base = "https://raw.githubusercontent.com/MCI-Metodologia/ignis-data/main/";
+        const mazo = document.getElementById('mazo');
+        let paso = 0; let n = 0;
+
+        for (let i = 1; i <= 30; i++) {
+            const div = document.createElement('div');
+            div.className = 'min';
+            const numPortada = 60 + i; 
+            div.innerHTML = `<img src="${base}${numPortada}.jpg" loading="lazy">`;
+            div.onclick = () => {
+                n = i; paso = 0;
+                document.getElementById('img1').src = `${base}${60 + i}.jpg`;
+                document.getElementById('img2').src = `${base}${2 * i - 1}.jpg`;
+                document.getElementById('visual').classList.remove('rotar');
+                document.getElementById('overlay').style.display = 'flex';
+            };
+            mazo.appendChild(div);
+        }
+
+        function girar() {
+            const v = document.getElementById('visual');
+            const i2 = document.getElementById('img2');
+            if (paso === 0) { v.classList.add('rotar'); paso = 1; }
+            else if (paso === 1) {
+                i2.style.opacity = '0';
+                setTimeout(() => { 
+                    i2.src = `${base}${2 * n}.jpg`; 
+                    i2.style.opacity = '1'; 
+                }, 200);
+                paso = 2;
+            }
+        }
+        function cerrar() { document.getElementById('overlay').style.display = 'none'; }
+    </script>
+</body>
+</html>
